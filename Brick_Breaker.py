@@ -101,12 +101,50 @@ class paddle():
         pygame.draw.rect(screen, paddle_outline, self.rect, 3)
 
 
+# ball class
+class game_ball():
+    def __init__(self, x, y):
+        self.ball_rad = 10
+        self.x = x - self.ball_rad
+        self.y = y
+        self.rect = Rect(self.x, self.y, self.ball_rad * 2, self.ball_rad * 2)
+        self.speed_x = 4
+        self.speed_y = -4
+        self.game_over = 0
+
+    def move(self):
+
+        # check for collision with walls
+        if self.rect.left < 0 or self.rect.right > screen_width:
+            self.speed_x *= -1
+
+        # check for collision with top and bottom of the screen
+        if self.rect.top < 0:
+            self.speed_y *= -1
+        if self.rect.bottom > screen_height:
+            self.game_over = -1
+
+        self.rect.x += self.speed_x
+        self.rect.y += self.speed_y
+
+        return self.game_over
+
+    def draw(self):
+        pygame.draw.circle(screen, paddle_col, (self.rect.x + self.ball_rad, self.rect.y + self.ball_rad),
+                           self.ball_rad)
+        pygame.draw.circle(screen, paddle_outline, (self.rect.x + self.ball_rad, self.rect.y + self.ball_rad),
+                           self.ball_rad, 3)
+
+
 # create a wall
 wall = wall()
 wall.create_wall()
 
 # create paddle
 player_paddle = paddle()
+
+# create ball
+ball = game_ball(player_paddle.x + (player_paddle.width // 2), player_paddle.y - player_paddle.height)
 
 run = True
 while run:
@@ -121,6 +159,10 @@ while run:
     # draw paddle
     player_paddle.draw()
     player_paddle.move()
+
+    # draw ball
+    ball.draw()
+    ball.move()
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
